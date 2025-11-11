@@ -1,37 +1,39 @@
 const OpenAI = require("openai");
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 module.exports = async (req, res) => {
-  try {
+  console.log("📩 Nueva petición recibida");
+  console.log("🧠 Clave API presente:", !!process.env.OPENAI_API_KEY);
 
-    console.log("🔑 API Key detectada:", process.env.OPENAI_API_KEY ? "Sí" : "No");
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(500).send("Falta OPENAI_API_KEY en el servidor");
+  }
+
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
+  try {
     const { msg } = req.query;
+    console.log("🗨️ Mensaje recibido:", msg);
 
     if (!msg) {
-      return res.status(400).send("Falta el parámetro 'msg'.");
+      return res.status(400).send("Falta parámetro msg");
     }
 
-    if (!process.env.OPENAI_API_KEY) {
-      console.error("❌ Falta la API key en las variables de entorno");
-      return res.status(500).send("Error: falta configuración del servidor.");
-    }
-
-    const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo", // usa este modelo por compatibilidad
       messages: [
-        { role: "system", content: "Eres un bot simpático de Twitch, responde corto y directo." },
+        { role: "system", content: "Eres un bot simpático para Twitch. Responde corto y directo." },
         { role: "user", content: msg },
       ],
     });
 
-    const respuesta = completion.choices[0]?.message?.content || "No entendí eso 😅";
+    console.log("✅ Respuesta generada correctamente");
+    const respuesta = completion.choices[0].message.content;
     res.status(200).send(respuesta);
-  } catch (err) {
-    console.error("🔥 Error en el servidor:", err);
-    res.status(500).send("Error interno del servidor.");
+  } catch (error) {
+    console.error("🔥 Error detectado:", error);
+    res.status(500).send(`Error interno: ${error.message}`);
   }
 };
 
