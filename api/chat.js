@@ -1,10 +1,10 @@
-import OpenAI from "openai";
+const OpenAI = require("openai");
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   try {
     const { msg } = req.query;
 
@@ -31,5 +31,5 @@ export default async function handler(req, res) {
     console.error("🔥 Error en el servidor:", err);
     res.status(500).send("Error interno del servidor.");
   }
-}
+};
 
