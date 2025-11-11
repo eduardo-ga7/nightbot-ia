@@ -6,6 +6,8 @@ const client = new OpenAI({
 
 module.exports = async (req, res) => {
   try {
+
+    console.log("🔑 API Key detectada:", process.env.OPENAI_API_KEY ? "Sí" : "No");
     const { msg } = req.query;
 
     if (!msg) {
