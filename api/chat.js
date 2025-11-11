@@ -5,25 +5,31 @@ const client = new OpenAI({
 });
 
 export default async function handler(req, res) {
-  const { msg } = req.query;
-
-  if (!msg) {
-    return res.status(400).send("Falta el mensaje (?msg=...)");
-  }
-
   try {
+    const { msg } = req.query;
+
+    if (!msg) {
+      return res.status(400).send("Falta el parámetro 'msg'.");
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("❌ Falta la API key en las variables de entorno");
+      return res.status(500).send("Error: falta configuración del servidor.");
+    }
+
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "Eres un asistente simpático para Twitch." },
+        { role: "system", content: "Eres un bot simpático de Twitch, responde corto y directo." },
         { role: "user", content: msg },
       ],
     });
 
-    const respuesta = completion.choices[0].message.content;
+    const respuesta = completion.choices[0]?.message?.content || "No entendí eso 😅";
     res.status(200).send(respuesta);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error en el servidor o en la API.");
+  } catch (err) {
+    console.error("🔥 Error en el servidor:", err);
+    res.status(500).send("Error interno del servidor.");
   }
 }
+
