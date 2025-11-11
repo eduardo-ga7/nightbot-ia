@@ -14,7 +14,7 @@ app.get("/", async (req, res) => {
   try {
     const completion = await client.responses.create({
       model: "gpt-4o-mini",
-      input: `Responde de forma breve, natural y divertida como si fueras un streamer de Twitch: ${text}`,
+      input: `Responde de forma breve, natural y divertida como si fueras un bot asistente en un chat de Twitch: ${text}`,
     });
 
     const respuesta = completion.output[0].content[0].text;
